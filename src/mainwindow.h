@@ -13,7 +13,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(PacketSender *packetSender, QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -26,6 +26,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     //QString COM;
-    PacketSender sender;
+    PacketSender *sender;
 };
 #endif // MAINWINDOW_H

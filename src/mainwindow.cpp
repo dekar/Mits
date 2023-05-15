@@ -8,13 +8,15 @@
 
 
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(PacketSender *packetSender, QWidget *parent)
+
+    :QMainWindow(parent)
+      , ui(new Ui::MainWindow)
+      ,sender(packetSender)
+
 {
     ui->setupUi(this);
-    sender.findCom();
-    ui->labelCOM->setText("Com port: "+sender.COM);
+    ui->labelCOM->setText("Com port: "+sender->COM);
 }
 
 MainWindow::~MainWindow()
@@ -29,15 +31,14 @@ void MainWindow::on_pushButton_clicked()
     uint8_t cmd = ui->lineCMD->text().toInt(nullptr,16);
     uint8_t dataNo = ui->lineDataNo->text().toInt(nullptr,16);
 
-    //TODO:data
-    MitshPacket mp = MitshPacket::generate(address, cmd,dataNo);
+    MitshPacket mp = MitshPacket(address, cmd, dataNo);
+
     mp.pushDataValue(
         ui->lineData->text().toULongLong(nullptr,16),
         ui->comboBox->currentText().toUInt()/2);
     ui->labelHEX->setText("PKG: "+mp.returnBytes());
-    QByteArray tmp = sender.sendPacket(mp);
+    QByteArray tmp = sender->sendPacket(mp);
     ui->lineAnswer->setText(tmp);
-
 }
 
 

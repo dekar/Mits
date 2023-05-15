@@ -1,37 +1,24 @@
+
+#include "packetsender.h"
+#include "clirunner.h"
 #include "mainwindow.h"
-#include "mitshpacket.h"
+
 
 #include <QApplication>
 #include <QDebug>
 
-bool checkArg(QString s, int numBytes)
-{
-    if(s.size() > (numBytes*2))
-        return false;
-    bool ok;
-    s.toUInt(&ok,16);
-    return ok;
-}
+const QString USB_description = QString("USB-SERIAL CH340");
 
 int main(int argc, char *argv[])
 {
+    PacketSender ps;
+    if(!ps.findCom(USB_description))
+        ps.error("No port with description \"" + USB_description + "\"!");
+    CliRunner cli(&ps);
+    if(cli.tryCli())
+        return cli.errorCode;
     QApplication a(argc, argv);
-    MainWindow w;
+    MainWindow w(&ps);
     w.show();
-/*    if (a.arguments().size()>2)
-    {
-        bool ok =
-            checkArg(a.arguments()[1],1) &&
-            checkArg(a.arguments()[2],1)  &&
-            checkArg(a.arguments()[3],1);
-        if(ok)
-        {
-            MitshPacket::generate(a.arguments()[1].nu,0x05,0x02);
-        }
-    }
-    MitshPacket mp = MitshPacket::generate(01,0x05,0x02);
-    mp.pushDataValue(0x11223344AABBCCDD,8);
-    QByteArray mifk = mp.returnBytes();
-    qDebug()<<mp.returnBytes();*/
     return a.exec();
 }

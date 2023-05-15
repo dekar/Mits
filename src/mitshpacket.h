@@ -22,12 +22,16 @@ private:
     void calcCRC();
     uint16_t crc(uint8_t byte);
     QByteArray toHex(uint8_t byte);
+
+
     MitshPacket();
 public:
     static MitshPacket generate(uint8_t address, uint8_t command, uint8_t dataNo);
+    MitshPacket(uint8_t address, uint8_t command, uint8_t dataNo);
     void pushData(uint8_t byte);
     void pushDataValue(uint64_t byte, uint8_t byteSize);
     QByteArray returnBytes();
+    void setAnswer(QByteArray data);
 };
 
 #endif // MITSHPACKET_H

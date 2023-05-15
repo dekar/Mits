@@ -3,6 +3,7 @@
 #include <QSerialPortInfo>
 #include <QSerialPort>
 #include <QThread>
+#include <QTextStream>
 
 PacketSender::PacketSender()
 {
@@ -11,6 +12,11 @@ PacketSender::PacketSender()
 
 QByteArray PacketSender::sendPacket(MitshPacket &p)
 {
+    if(COM.isEmpty())
+    {
+        error("Serial port not founded!");
+        return QByteArray();
+    }
     QSerialPort *serial = new QSerialPort(COM);
     serial->setBaudRate(115200);
     serial->setDataBits(QSerialPort::Data8);
@@ -20,23 +26,22 @@ QByteArray PacketSender::sendPacket(MitshPacket &p)
     serial->setStopBits(QSerialPort::OneStop);
     //We will chose the Flow controls
     serial->setFlowControl(QSerialPort::NoFlowControl);
-    if (serial->open(QIODevice::ReadWrite)) {
-
-    } else {
-        //QMessageBox::critical(this, tr("Error"), serial->errorString());
+    if (!serial->open(QIODevice::ReadWrite))
+    {
+        error("Can't open serial port: "+ serial->errorString());
+        return QByteArray();
     }
     serial->write(p.returnBytes());
     serial->flush();
     serial->waitForReadyRead(300);
     serial->thread()->usleep(100*1000);
     QByteArray tmp = serial->readAll();
-
     serial->close();
     delete serial;
     return tmp;
 }
 
-void PacketSender::findCom()
+bool PacketSender::findCom(QString name)
 {
     const auto serialPortInfos = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo &portInfo : serialPortInfos) {
@@ -54,10 +59,20 @@ void PacketSender::findCom()
                  << (portInfo.hasProductIdentifier()
                          ? QByteArray::number(portInfo.productIdentifier(), 16)
                          : QByteArray());*/
-        if (portInfo.description() == "USB-SERIAL CH340")
+        if (portInfo.description() == name)
         {
             this->COM = portInfo.portName();
+            return true;
         }
     }
+    return false;
+}
+
+void PacketSender::error(QString message)
+{
+    message = message.simplified()+"\n";
+    QTextStream err(stderr);
+    err<< message;
+    err.flush();
 }
 

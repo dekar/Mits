@@ -12,7 +12,8 @@ class PacketSender
 public:
     PacketSender();
     QByteArray sendPacket(MitshPacket &p);
-    void findCom();
+    bool findCom(QString name);
+    void error(QString message);
     QString COM;
 };
 

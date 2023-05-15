@@ -33,7 +33,7 @@ MitshPacket::MitshPacket()
 
 }
 
-MitshPacket MitshPacket::generate(uint8_t address, uint8_t command, uint8_t dataNo)
+/*MitshPacket MitshPacket::generate(uint8_t address, uint8_t command, uint8_t dataNo)
 {
     MitshPacket res;
     res.address = address;
@@ -41,6 +41,12 @@ MitshPacket MitshPacket::generate(uint8_t address, uint8_t command, uint8_t data
     res.dataNo = dataNo;
     res.calcCRC();
     return res;
+}*/
+
+MitshPacket::MitshPacket(uint8_t address, uint8_t command, uint8_t dataNo)
+    :address(address),command(command),dataNo(dataNo)
+{
+    calcCRC();
 }
 
 void MitshPacket::pushData(uint8_t byte)
